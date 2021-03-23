@@ -1,5 +1,6 @@
 import sqlite3
 
+
 from flask import Flask, jsonify, request, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 from faker import Faker
