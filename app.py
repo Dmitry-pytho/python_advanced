@@ -1,14 +1,14 @@
 import sqlite3
 
-
 from flask import Flask, jsonify, request, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 from faker import Faker
 
-
 fake = Faker()
 
 DATABASE = "users.db"
+
+
 # connection = sqlite3.connect(DATABASE)
 # cursor = connection.cursor()
 # cursor.execute(
@@ -106,3 +106,5 @@ def users_add():
     cn.commit()
     return redirect(url_for('users_all'))
 
+
+print()
