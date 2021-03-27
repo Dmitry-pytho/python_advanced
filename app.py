@@ -56,8 +56,8 @@ def users_del_all():
 
 @app.route("/users/count")
 def users_count():
-    number = User.query.count()
-    return jsonify({"count": number})
+    numbers = User.query.count()
+    return jsonify({"count": numbers})
 
 
 @app.route("/users/add", methods=['GET', 'POST'])
