@@ -1,5 +1,3 @@
-import sqlite3
-
 from flask import Flask, jsonify, request, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 from faker import Faker
@@ -7,29 +5,6 @@ from faker import Faker
 fake = Faker()
 
 DATABASE = "users.db"
-
-
-# connection = sqlite3.connect(DATABASE)
-# cursor = connection.cursor()
-# cursor.execute(
-#     """
-#     CREATE TABLE IF NOT EXISTS users (
-#         id INTEGER PRIMARY KEY,
-#         name TEXT NOT NULL,
-#         email TEXT NOT NULL
-#     )
-#     """
-# )
-
-
-def db_con():
-    cn = None
-    try:
-        cn = sqlite3.connect(DATABASE)
-    except Exception as e:
-        print(e)
-    return cn
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -52,19 +27,15 @@ class User(db.Model):
 
 
 @app.route("/")
-def home():
-    return "Welcome Home!"
+def main_page():
+    return render_template("main_page.html")
 
 
 @app.route("/users/all")
 def users_all():
-    cn = db_con()
-    cur = cn.execute("select * from users")
-    users = [
-        dict(id=row[0], name=row[1], email=row[2])
-        for row in cur.fetchall()
-    ]
-    return jsonify(users)
+    users = User.query.all()
+    users_list = [dict(id=user.id, name=user.name, email=user.email) for user in users]
+    return jsonify(users_list)
 
 
 @app.route("/users/gen")
@@ -77,34 +48,27 @@ def users_gen():
 
 @app.route("/users/delete-all")
 def users_del_all():
-    conn = db_con()
-    conn.execute("delete from users")
-    conn.commit()
+    User.query.delete()
+    db.session.commit()
+
     return redirect(url_for('users_all'))
 
 
 @app.route("/users/count")
 def users_count():
-    conn = db_con()
-    cur = conn.execute("select count(1) as cnt from users")
-    row = cur.fetchone()
-    if row is None:
-        return ValueError("Could not count users")
-    return jsonify({"count": row[0]})
+    number = User.query.count()
+    return jsonify({"count": number})
 
 
 @app.route("/users/add", methods=['GET', 'POST'])
 def users_add():
-    cn = db_con()
     if request.method == "GET":
         return render_template("user_add.html")
     else:
         name = request.form["user_name"]
         email = request.form["email"]
-    sql = """insert into users (name, email) values (?, ?)"""
-    cn.cursor().execute(sql, (name, email))
-    cn.commit()
+    user = User(name=name, email=email)
+    db.session.add(user)
+    db.session.commit()
+
     return redirect(url_for('users_all'))
-
-
-print()
