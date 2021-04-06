@@ -7,4 +7,4 @@ python:
 install:
   - pip install -r requirements.txt
 script:
-  - flake app.py
+  - flake8 app.py
