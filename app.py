@@ -1,6 +1,8 @@
-from flask import Flask, jsonify, request, redirect, url_for, render_template
-from flask_sqlalchemy import SQLAlchemy
 from faker import Faker
+
+from flask import Flask, jsonify, redirect, render_template, request, url_for
+
+from flask_sqlalchemy import SQLAlchemy
 
 fake = Faker()
 
@@ -34,7 +36,8 @@ def main_page():
 @app.route("/users/all")
 def users_all():
     users = User.query.all()
-    users_list = [dict(id=user.id, name=user.name, email=user.email) for user in users]
+    users_list = [dict(id=user.id, name=user.name, email=user.email)
+                  for user in users]
     return jsonify(users_list)
 
 
